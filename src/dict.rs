@@ -280,7 +280,7 @@ pub(crate) const VALUES_JSON: &str = r#"{
 "zapgremlins": "(x --> z)"
 }
 },
-"binaryMath": {
+"mathBinary": {
     "description": "Binary mathematical operations.",
     "items":{
 "op/": "(list --> z) reducing math operator.",
