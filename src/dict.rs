@@ -1,5 +1,7 @@
-pub(crate) const VALUES_JSON: &str = r#"
-{
+pub(crate) const VALUES_JSON: &str = r#"{
+"stackOps": {
+    "description": "Operations on the stack.",
+    "items": {
 "clear": "(... -->) clears everything off the stack.",
 "cleard": "(... a --> a) clears all but the top item from the stack.",
 "stackDepth": "(--> n) returns the size of the stack.",
@@ -16,8 +18,18 @@ pub(crate) const VALUES_JSON: &str = r#"
 "aabb": "(a b --> a a b b) reorder items on stack.",
 "abab": "(a b --> a b a b) reorder items on stack.",
 "nip": "(a b --> b) remove second item on stack.",
-"pop": "(a -->) remove top item on stack.",
-"do": "(list \\item[..] -->) applies the function to each item of a finite list. Useful for side effects like printing or file writing.",
+"pop": "(a -->) remove top item on stack."
+}
+},
+"loopOps": {
+    "description": "Loops and control flow.",
+    "items": {
+"do": "(list \\item[..] -->) applies the function to each item of a finite list. Useful for side effects like printing or file writing."
+}
+},
+"conditionalOps": {
+    "description": "Conditionals and control flow",
+    "items": {
 "equals": "(a b --> bool) returns 1 if a and b are structurally equivalent. If the data structures are cyclic then this may never terminate.",
 "less": "(a b --> bool) returns 1 if a is less than b structurally. If the data structures are cyclic then this may never terminate.",
 "greater": "(a b --> bool) returns 1 if a is greater than b structurally. If the data structures are cyclic then this may never terminate.",
@@ -25,7 +37,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "not": "(A --> bool) returns 0 if A is true and 1 if A is false.",
 "try": "(A B --> ..) apply function A. if an exception is thrown, function B is applied.",
 "throw": "(a -->) throw an exception.",
-"protect": "(A B --> ..) apply function A. if an exception is thrown, function B is applied and the exception is rethrown. Otherwise function B is applied and control continues as normal.",
+"protect": "(A B --> ) apply A. if exception, apply B and rethrow exception. Otherwise apply B and control continues as normal."
+}
+},
+"formOps": {
+    "description": "Operations on forms.",
+    "items": {
 "has": "(form key --> bool) return whether a form contains the key.",
 "keys": "(form --> keys) return an array of the keys of the form.",
 "values": "(form --> values) return an array of the values of the form.",
@@ -34,19 +51,34 @@ pub(crate) const VALUES_JSON: &str = r#"
 "parent": "(form --> parent) return the tail of the prototype inheritance list.",
 "dot": "(form key --> item) return the value for the key.",
 "pushWorkspace": "(-->) pushes a new outer scope onto the workspace. New bindings will be made in the new outer scope.",
-"popWorkspace": "(-->) pops a scope from the workspace. All bindings in the outer scope will be forgotten.",
+"popWorkspace": "(-->) pops a scope from the workspace. All bindings in the outer scope will be forgotten."
+}
+},
+"refOps": {
+    "description": "Operations on refs.",
+    "items": {
 "get": "(r --> a) return the value store in a ref.",
 "set": "(a r -->) store the value a in the ref r.",
 "R": "(a --> r) create a new Ref with the inital value a",
 "ZR": "(z --> r) create a new ZRef with the inital value z. A ZRefs is a mutable reference to a real number.",
 "P": "(a --> out in) create a new stream plug pair with the inital value a",
-"ZP": "(a --> out in) create a new signal plug pair with the inital value a.",
+"ZP": "(a --> out in) create a new signal plug pair with the inital value a."
+}
+},
+"functionOps": {
+    "description": "Operations on functions.",
+    "items": {
 "Y": "(funA --> funB) Y combinator. funB calls funA with the last argument being funB itself. Currently the only way to do recursion.",
 "e.g.": "\\x f [x 2 < \\[1] \\[ x x -- f *] if] Y = factorial    7 factorial --> 5040",
 "noeach": "(fun --> fun) sets a flag in the function so that it will pass through arguments with @ operators without mapping them.",
 "!": "(... f --> ...) apply the function to its arguments, observing @ arguments as appropriate.",
 "!e": "(form fun --> ...) for each argument in the function, find the same named fields in the form and push those values as arguments to the function.",
-"compile": "(string --> fun) compile the string and return a function.",
+"compile": "(string --> fun) compile the string and return a function."
+}
+},
+"printOps": {
+    "description": "Operations on printing.",
+    "items": {
 "printLength": "(--> length) return the number of items printed for lists.",
 "printDepth": "(--> depth) return the number of levels of nesting printed for lists.",
 "setPrintLength": "(length --> ) set the number of items printed for lists.",
@@ -58,31 +90,66 @@ pub(crate) const VALUES_JSON: &str = r#"
 "tab": "(-->) print a tab.",
 "prstk": "(-->) print the stack.",
 "minfo": "(-->) print memory management info.",
-"listdump": "(list -->) prints information about a list.",
+"listdump": "(list -->) prints information about a list."
+}
+},
+"strings": {
+    "description": "Operations on strings.",
+    "items": {
 "str": "(x --> string) convert x to a string.",
 "debugstr": "(x --> string) convert x to a debug string.",
 "strcat": "(list separator --> string) convert elements of list to a string with separator string between each.",
 "strlines": "(list --> string) convert elements of list to a newline separated string.",
-"glob": "(pattern --> paths) return a list of file path names that match.",
+"glob": "(pattern --> paths) return a list of file path names that match."
+}
+},
+"samplerate": {
+    "description": "Operations on audio.",
+    "items": {
 "sr": "(--> sampleRate) returns the sample rate. samples per second.",
 "nyq": "(--> sampleRate/2) returns the nyquist rate",
 "isr": "(--> 1/sampleRate) returns the inverse sample rate",
 "inyq": "(--> 2/sampleRate) returns the inverse nyquist rate.",
-"rps": "(--> 2pi/sampleRate) returns the radians per sample",
+"rps": "(--> 2pi/sampleRate) returns the radians per sample"
+}
+},
+"help": {
+    "description": "Help functions.",
+    "items": {
 "help": "(fun -->) prints help for a function.",
 "helpbifs": "(-->) prints help for all built in functions.",
 "helpudfs": "(-->) prints help for all user defined functions.",
 "helpall": "(-->) prints help for all built in and user defined functions.",
-"helpLine": "(string -->) add a line to the user defined function help.",
+"helpLine": "(string -->) add a line to the user defined function help."
+}
+},
+"threadOps": {
+    "description": "Launch functions in new threads.",
+    "items": {
 "go": "(fun -->) launches the function in a new thread.",
-"sleep": "(seconds -->) sleeps the current thread for the time given.",
+"sleep": "(seconds -->) sleeps the current thread for the time given."
+}
+},
+"misc": {
+    "description": "Miscellaneous functions.",
+    "items": {
 "type": "(a --> symbol) return a symbol naming the type of the value a.",
-"trace": "(bool -->) turn tracing on/off in the interpreter.",
+"trace": "(bool -->) turn tracing on/off in the interpreter."
+}
+},
+"textFiles": {
+    "description": "Text file operations.",
+    "items": {
 "load": "(filename -->) compiles and executes a text file.",
 "prelude": "(-->) opens the prelude file in the default text editor.",
 "examples": "(-->) opens the examples file in the default text editor.",
 "logfile": "(-->) opens the log file in the default text editor.",
-"readme": "(-->) opens the README file in the default text editor.",
+"readme": "(-->) opens the README file in the default text editor."
+}
+},
+"mathUnary": {
+    "description": "Unary math ops",
+    "items": {
 "isalnum": "(x --> z) return whether an ASCII value is alphanumeric.",
 "isalpha": "(x --> z) return whether an ASCII value is alphabetic.",
 "isblank": "(x --> z) return whether an ASCII value is a space or tab character.",
@@ -210,14 +277,18 @@ pub(crate) const VALUES_JSON: &str = r#"
 "sinWin": "(x --> z) sine window for x in the interval [0,1]",
 "ramp": "(x --> z) return 0 when x <= 0, return x when 0 < x < 1, return 1 when x > 1.",
 "scurve": "(x --> z) return 0 when x <= 0, return 3*x*x - 2*x*x*x when 0 < x < 1, return 1 when x > 1.",
-"zapgremlins": "(x --> z)",
+"zapgremlins": "(x --> z)"
+}
+},
+"binaryMath": {
+    "description": "Binary mathematical operations.",
+    "items":{
 "op/": "(list --> z) reducing math operator.",
 "op\\": "(list --> z) scanning math operator.",
 "op^": "(list --> z) pairwise math operator.",
 "op/i": "(list init --> z) reducing math operator with initial value.",
 "op\\i": "(list init --> z) scanning math operator with initial value.",
 "op^i": "(list init --> z) pairwise math operator with initial value.",
-"For": "example, + has the following variations: +/  +\\  +^  +/i  +\\i  +^i",
 "+": "(x y --> z) addition.",
 "+>": "(x y --> z) addition. For lists, acts as if shorter list were extended with zeroes.",
 "-": "(x y --> z) subtraction.",
@@ -272,12 +343,22 @@ pub(crate) const VALUES_JSON: &str = r#"
 "excess": "(x y --> z) return the excess after clipping. x x y clip2 -",
 "round": "(x y --> z) round x to nearest multiple of y.",
 "roundUp": "(x y --> z) round x to nearest multiple of y >= x.",
-"trunc": "(x y --> z) round x to nearest multiple of y <= x",
+"trunc": "(x y --> z) round x to nearest multiple of y <= x"
+}
+},
+"listConv": {
+    "description": "List conversion",
+    "items": {
 "V": "(signal --> stream) converts a signal or string to a stream.",
 "Z": "(series --> signal) converts a stream or string to a signal.",
 "L": "(anything --> stream) streams are returned as is. anything else is made into an infinite stream of itself.",
 "L1": "(anything --> stream) streams are returned as is. anything else is wrapped in a one item list.",
-"unspell": "(sequence --> string) converts a stream of numbers or a signal to a string.",
+"unspell": "(sequence --> string) converts a stream of numbers or a signal to a string."
+}
+},
+"listOpsBasic": {
+    "description": "Basic list operations",
+    "items": {
 "size": "(seq --> num) Return the length of a sequence if it is finite. Returns inf if the sequence is of indefinite length (It may not actually be infinitely long).",
 "rank": "(a --> n) Return the rank of an object. Makes the assumption that lists at all depths are homogenous.",
 "shape": "(a --> [n..]) Return the shape of an object. Axes of indefinite length are represented by inf. Makes the assumption that lists at all depths are homogenous.",
@@ -290,7 +371,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "cons": "(list item --> list) returns a new list with the item added to the front.",
 "uncons": "(list --> tail head) returns the tail and head of a list. fails if list is empty.",
 "pack": "(list --> list) returns a packed version of the list.",
-"packed": "(list --> bool) returns whether the list is packed.",
+"packed": "(list --> bool) returns whether the list is packed."
+}
+},
+"listGen": {
+    "description": "List generation",
+    "items": {
 "ord": "(--> series) return an infinite series of integers ascending from 1.",
 "nat": "(--> series) return an infinite series of integers ascending from 0.",
 "invs": "(--> series) return an infinite series of reciprocals. equivalent to ord 1/",
@@ -332,7 +418,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "lindiv1z": "(n start end --> series) returns a signal of n equal steps from start up to but not including end.",
 "expdiv1z": "(n start end --> series)  returns a signal of n exponentially spaced steps from start up to but not including end.",
 "line": "(dur start end --> z) return a signal ramping linearly from start to end in dur seconds.",
-"xline": "(dur start end --> z) return a signal ramping exponentially from start to end in dur seconds.",
+"xline": "(dur start end --> z) return a signal ramping exponentially from start to end in dur seconds."
+}
+},
+"listOrd": {
+    "description": "List generation",
+    "items": {
 "reduce": "(list value fun --> value) applies fun to each item in list and the current value to get a new value. returns the ending value.",
 "reduce1": "(list fun --> value) like reduce except that the initial value is the first item in the list.",
 "scan": "(list value fun --> list) applies fun to each item in list and the current value to get a new value, which is added to the output list.",
@@ -394,7 +485,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "permzwr": "(a --> b) returns a returns a list of all unique permutations of an input signal with repeated elements. automaps over streams.",
 "shortas": "(a b --> a') makes list a as short as list b.",
 "longas": "(a b --> a') makes list a as long as list b by repeating the last item.",
-"longas0": "(a b --> a') makes list a as long as list b by appending zeroes.",
+"longas0": "(a b --> a') makes list a as long as list b by appending zeroes."
+}
+},
+"listOps": {
+    "description": "Basic list operations",
+    "items": {
 "bub": "(a --> [a]) makes the top item on the stack into a one item list. i.e. puts a bubble around it.",
 "nbub": "(a n --> [[..[a]..]]) embeds the top item in N one item lists.",
 "2ple": "(a b --> [a b]) make a pair from the top two stack items.",
@@ -438,10 +534,20 @@ pub(crate) const VALUES_JSON: &str = r#"
 "sort>": "(in --> out) descending order sort of the input list.",
 "grade": "(in --> out) ascending order sorted indices of the input list.",
 "gradef": "(in fun --> out) sorted indices of the input list using a compare function.",
-"grade>": "(in --> out) descending order sorted indices of the input list.",
+"grade>": "(in --> out) descending order sorted indices of the input list."
+}
+},
+"eventListOps": {
+    "description": "Basic event list operations",
+    "items": {
 "evmerge": "(a b t --> c) merges event list 'b' with delay 't' with event list 'a' according to their delta times",
 "evdelay": "(a t --> c) delay an event list by adding a preceeding rest of duration 't'",
-"evrest": "(t --> c) returns a rest event for duration 't'.",
+"evrest": "(t --> c) returns a rest event for duration 't'."
+}
+},
+"dspOps": {
+    "description": "Basic DSP operations",
+    "items": {
 "kaiser": "(n stopBandAttenuation --> out) returns a signal filled with a kaiser window with the given stop band attenuation.",
 "hanning": "(n --> out) returns a signal filled with a Hanning window.",
 "hamming": "(n --> out) returns a signal filled with a Hamming window.",
@@ -449,7 +555,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "fft": "(re im --> out) returns the complex FFT of two vectors (one real and one imaginary) which are a power of two length.",
 "ifft": "(re im --> out) returns the complex IFFT of two vectors (one real and one imaginary) which are a power of two length.",
 "seg": "(in hops durs --> out) divide input signal in to a stream of signal segments of given duration stepping by hop time.",
-"wseg": "(in hops window --> out) divide input signal in to a stream of windowed signal segments of lengths equal to the window length, stepping by hop time.",
+"wseg": "(in hops window --> out) divide input signal in to a stream of windowed signal segments of lengths equal to the window length, stepping by hop time."
+}
+},
+"audioIOOps": {
+    "description": "Basic audio I/O operations",
+    "items": {
 "play": "(channels -->) plays the audio to the hardware.",
 "record": "(channels filename -->) plays the audio to the hardware and records it to a file.",
 "stop": "(-->) stops any audio playing.",
@@ -457,9 +568,19 @@ pub(crate) const VALUES_JSON: &str = r#"
 ">sf": "(channels filename -->) writes the audio to a file.",
 ">sfo": "(channels filename -->) writes the audio to a file and opens it in the default application.",
 "bench": "(channels -->) prints the amount of CPU required to compute a segment of audio. audio must be of finite duration.",
-"sgram": "(signal dBfloor filename -->) writes a spectrogram to a file and opens it.",
+"sgram": "(signal dBfloor filename -->) writes a spectrogram to a file and opens it."
+}
+},
+"randomNums": {
+    "description": "Single random generation",
+    "items": {
 "newseed": "(--> seed) make a new random seed.",
-"setseed": "(seed -->) set the random seed.",
+"setseed": "(seed -->) set the random seed."
+}
+},
+"randomNumbers": {
+    "description": "Single random numbers",
+    "items": {
 "rand": "(a b --> r) return a uniformly distributed random real value from a to b.",
 "coin": "(p --> r) return 1 with probability p, or 0 with probability (1-p).",
 "rand2": "(a --> r) return a uniformly distributed random real value from -a to +a.",
@@ -470,7 +591,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "ilinrand": "(a b --> r) return a linearly distributed random integer value from a to b.",
 "wrand": "(w --> r) return a randomly chosen index from a list of probability weights. w should sum to one.",
 "pick": "(a --> r) return a randomly chosen element from the finite list a.",
-"wpick": "(a w --> r) return a randomly chosen element from the finite list a using probability weights from w. w must be the same length as a and should sum to one.",
+"wpick": "(a w --> r) return a randomly chosen element from the finite list a using probability weights from w. w must be the same length as a and should sum to one."
+}
+},
+"randomStreams": {
+    "description": "Random streams",
+    "items": {
 "rands": "(a b --> r) return a stream of uniformly distributed random real values from a to b.",
 "coins": "(p --> r) return a stream of 1 with probability p, or 0 with probability (1-p).",
 "eprands": "(a b --> r) return a stream of uniformly distributed random integer values from a to b, excluding the previously returned value.",
@@ -494,7 +620,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "ilinrandz": "(a b --> r) return a signal of linearly distributed random integer values from a to b.",
 "wrandz": "(w --> r) return a signal of randomly chosen indices from a list of probability weights. w should sum to one.",
 "pickz": "(a --> r) return a signal of randomly chosen elements from the finite list a.",
-"wpickz": "(a w --> r) return a signal of randomly chosen elements from the finite list a using probability weights from w. w must be the same length as a and should sum to one.",
+"wpickz": "(a w --> r) return a signal of randomly chosen elements from the finite list a using probability weights from w. w must be the same length as a and should sum to one."
+}
+},
+"randomSignals": {
+    "description": "Random signals",
+    "items": {
 "nrands": "(n a b --> r) return a stream of n uniformly distributed random real values from a to b.",
 "ncoins": "(n p --> r) return a stream of n 1 with probability p, or 0 with probability (1-p).",
 "neprands": "(n a b --> r) return a stream of n uniformly distributed random integer values from a to b, excluding the previously returned value.",
@@ -518,7 +649,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "nilinrandz": "(n a b --> r) return a signal of n linearly distributed random integer values from a to b.",
 "nwrandz": "(n w --> r) return a signal of n randomly chosen indices from a list of probability weights. w should sum to one.",
 "npickz": "(n a --> r) return a signal of n randomly chosen elements from the finite signal a.",
-"nwpickz": "(n a w --> r) return a signal of n randomly chosen elements from the finite signal a using probability weights from w. w must be the same length as a and should sum to one.",
+"nwpickz": "(n a w --> r) return a signal of n randomly chosen elements from the finite signal a using probability weights from w. w must be the same length as a and should sum to one."
+}
+},
+"noiseUgens":{
+    "description": "Noise generators",
+    "items": {
 "violet": "(amp --> z) violet noise",
 "blue": "(amp --> z) blue noise",
 "xorwhite": "(amp --> z) white noise",
@@ -537,12 +673,22 @@ pub(crate) const VALUES_JSON: &str = r#"
 "velvet": "(density amp --> z) a stream of impulses whose amplitude is randomly either -a or +a and whose average density is in impulses per second.",
 "toosh": "(delay amp --> z) flanged noise. difference of two white noise sources with a delay.",
 "tooshp": "(delay amp--> z) flanged noise. sum of two white noise sources with a delay. no null at delay == 0.",
-"crackle": "(param --> z) a chaotic generator.",
+"crackle": "(param --> z) a chaotic generator."
+}
+},
+"wavetable": {
+    "description": "Wavetable generators",
+    "items": {
 "wavefill": "@aak (amps phases smooth -> wavetable) generates a set 1/3 octave wavetables for table lookup oscillators. sin(i*theta + phases[i])*amps[i]*pow(cos(pi*i/n), smooth). smoothing reduces Gibb's phenomenon. zero is no smoothing",
 "parTbl": "- parabolic wave table.",
 "triTbl": "- triangle wave table.",
 "sqrTbl": "- square wave table.",
-"sawTbl": "- sawtooth wave table.",
+"sawTbl": "- sawtooth wave table."
+}
+},
+"oscUgens": {
+    "description": "Oscillator generators",
+    "items": {
 "osc": "@zzz (freq phase wavetable --> out) band limited wave table oscillator. wavetable is a table created with wavefill.",
 "oscp": "@zzzz (freq phase phaseOffset wavetable --> out) band limited wave table oscillator pair with phase offset.",
 "sosc": "@zz (freq1 freq2 wavetable --> out) band limited hard sync wave table oscillator. freq1 is the fundamental. freq2 is the slave oscil frequency.",
@@ -569,7 +715,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "tsinosc": "@zz (freq iphase --> out) sine wave oscillator.",
 "sinoscfb": "@zzz (freq phase feedback --> out) sine wave oscillator with self feedback phase modulation",
 "sinoscm": "@zzzz (freq phase mul add --> out) sine wave oscillator with multiply and add.",
-"klang": "(freqs amps iphases --> out) a sine oscillator bank. freqs amps and iphases are arrays.",
+"klang": "(freqs amps iphases --> out) a sine oscillator bank. freqs amps and iphases are arrays."
+}
+},
+"filterUgens": {
+    "description": "Filter generator",
+    "items": {
 "lag": "@zz (in decayTime --> out) one pole lag filter. decayTime determines rate of convergence.",
 "lag2": "@zz (in decayTime --> out) cascade of two one pole lag filters. decayTime determines rate of convergence.",
 "lag3": "@zz (in decayTime --> out) cascade of three one pole lag filters. decayTime determines rate of convergence.",
@@ -606,7 +757,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "decay": "@zz (in decayTime --> out) outputs an exponential decay for impulses at the input.",
 "decay2": "@zzz (in atkTime dcyTime --> out) outputs an exponential attack and decay for impulses at the input.",
 "hilbert": "@z (in --> outA outB) returns two signals that are 90 degrees phase shifted from each other.",
-"ampf": "@zzz (in atkTime dcyTime --> out) amplitude follower.",
+"ampf": "@zzz (in atkTime dcyTime --> out) amplitude follower."
+}
+},
+"delayUgens": {
+    "description": "Delay generators",
+    "items": {
 "delayn": "@zzk (in delay maxdelay --> out) delay line with no interpolation.",
 "delayl": "@zzk (in delay maxdelay --> out) delay line with linear interpolation.",
 "delayc": "@zzk (in delay maxdelay --> out) delay line with cubic interpolation.",
@@ -618,9 +774,19 @@ pub(crate) const VALUES_JSON: &str = r#"
 "lpcombc": "@zzkzz (in delay maxdelay decayTime lpfreq --> out) low pass comb delay filter with cubic interpolation.",
 "alpasn": "@zzkz (in delay maxdelay decayTime --> out) all pass delay filter with no interpolation.",
 "alpasl": "@zzkz (in delay maxdelay decayTime --> out) all pass delay filter with linear interpolation.",
-"alpasc": "@zzkz (in delay maxdelay decayTime --> out) all pass delay filter with cubic interpolation.",
+"alpasc": "@zzkz (in delay maxdelay decayTime --> out) all pass delay filter with cubic interpolation."
+}
+},
+"controlRate": {
+    "description": "Control rate",
+    "items": {
 "kr": "(fun n --> out) evaluates fun with the current sample rate divided by n, then linearly upsamples all returned signals by n.",
-"krc": "(fun n --> out) evaluates fun with the current sample rate divided by n, then cubically upsamples all returned signals by n.",
+"krc": "(fun n --> out) evaluates fun with the current sample rate divided by n, then cubically upsamples all returned signals by n."
+}
+},
+"controlUgens": {
+    "description": "Control function generators",
+    "items": {
 "imps": "@aaz (values durs rate --> out) single sample impulses.",
 "steps": "@aaz (values durs rate --> out) steps",
 "gates": "@aaaz (values durs holds rate --> out) gates",
@@ -630,9 +796,19 @@ pub(crate) const VALUES_JSON: &str = r#"
 "curves": "@aaaz (values curvatures durs rate --> out) curves.",
 "lfnoise0": "@z (freq --> out) step noise source.",
 "lfnoise1": "@z (freq --> out) ramp noise source.",
-"lfnoise3": "@z (freq --> out) cubic spline noise source.",
-"tempo": "@az ([bps dur bps dur ...] rate --> out) returns a signal of tempo vs time given a list of interleaved tempos (in beats per second) and durations (in beats).",
-"beats": "@z (tempo --> beats) integrates a tempo signal to produce a signal of the time in beats.",
+"lfnoise3": "@z (freq --> out) cubic spline noise source."
+}
+},
+"tempoUgens": {
+    "description": "Tempo unit generators",
+    "items": {
+"tempo": "([bps dur bps dur ...] rate --> out) returns a signal of tempo vs time given a list of interleaved tempos (in beats per second) and durations (in beats).",
+"beats": "(tempo --> beats) integrates a tempo signal to produce a signal of the time in beats."
+}
+},
+"envelopeUgens": {
+    "description": "Envelope generators",
+    "items": {
 "adsr": "@akkz ([attack decay sustain release] amp dur tempo --> envelope) an envelope generator.",
 "dadsr": "@akkz ([delay attack decay sustain release] amp dur tempo --> envelope) an envelope generator.",
 "dahdsr": "@akkz ([delay attack hold decay sustain release] amp dur tempo --> envelope) an envelope generator.",
@@ -660,26 +836,56 @@ pub(crate) const VALUES_JSON: &str = r#"
 "ttrapez2env": "@zaa (trig dur amp --> out) triggered trapezoid squared envelope. (2 - |x-.5| - |x+.5|)^2 for x from -1 to 1",
 "tcosenv": "@zaa (trig dur amp --> out) triggered cosine envelope.",
 "thanenv": "@zaa (trig dur amp --> out) triggered hanning envelope.",
-"than2env": "@zaa (trig dur amp --> out) triggered hanning squared envelope.",
-"ola": "(sounds hops rate numChannels --> out) overlap add. This is the basic operator for polyphony.",
-"pause": "@zz (in amp --> out) pauses the input when amp is <= 0, otherwise in is multiplied by amp.",
-"itd": "@zzk (in pan maxdelay --> out) interaural time delay.",
-"pan2": "@zz (in pos --> [left right]) stereo pan. pos 0 is center. pos -1 is full left, pos +1 is full right.",
-"rot2": "@zzz (left right pos --> [left right]) stereo rotation. pos 0 is no rotation, +/-1 is 180 degrees, -.5 is -90 degrees, +.5 is +90 degrees.",
+"than2env": "@zaa (trig dur amp --> out) triggered hanning squared envelope."
+}
+},
+"spawn": {
+    "description": "Spawn",
+    "items": {
+"ola": "(sounds hops rate numChannels --> out) overlap add. This is the basic operator for polyphony."
+}
+},
+"pause": {
+    "description": "Pause",
+    "items": {
+"pause": "@zz (in amp --> out) pauses the input when amp is <= 0, otherwise in is multiplied by amp."
+}
+},
+"panUgens": {
+    "description": "Panning",
+    "items": {
+"itd": "(in pan maxdelay --> out) interaural time delay.",
+"pan2": "(in pos --> [left right]) stereo pan. pos 0 is center. pos -1 is full left, pos +1 is full right.",
+"rot2": "(left right pos --> [left right]) stereo rotation. pos 0 is no rotation, +/-1 is 180 degrees, -.5 is -90 degrees, +.5 is +90 degrees.",
 "bal2": "@zzz (left right pos --> [left right]) stereo balance control. pos 0 is center. pos -1 is full left, pos +1 is full right.",
-"fade2": "@zzz (left right pos --> out) cross fade between two inputs. pos 0 is equal mix. pos -1 is all left, pos +1 is all right.",
+"fade2": "@zzz (left right pos --> out) cross fade between two inputs. pos 0 is equal mix. pos -1 is all left, pos +1 is all right."
+}
+},
+"trigUgens": {
+    "description": "Trigger generators",
+    "items": {
 "tr": "@z (in --> out) transitions from nonpositive to positive become single sample impulses.",
 "ntr": "@z (in --> out) transitions from negative to nonnegative become single sample impulses.",
 "gate": "@z (in hold --> out) outputs 1 for hold seconds after each trigger, else outputs zero.",
 "sah": "@zz (in trigger --> out) sample and hold",
 "seq": "@az (in trigger --> out) pulls one value from the input for each trigger. output sustains at that level until the next trigger.",
 "iseq": "@az (in trigger --> out) pulls one value from the input for each trigger. outputs that value for one sample. outputs zero when there is no trigger.",
-"pdiv": "@zzz (in n istart --> out) pulse divider. outputs one impulse from the output for each n impulses in the input. istart is an offset. istart = 0 outputs a pulse on the first input pulse.",
+"pdiv": "@zzz (in n istart --> out) pulse divider. outputs one impulse from the output for each n impulses in the input. istart is an offset. istart = 0 outputs a pulse on the first input pulse."
+}
+},
+"boundsUgens": {
+    "description": "Clippers wrappers",
+    "items": {
 "clip": "@zzz (in lo hi --> out) constrain the input to the bounds by clipping.",
 "wrap": "@zzz (in lo hi --> out) constrain the input to the bounds by wrapping.",
 "fold": "@zzz (in lo hi --> out) constrain the input to the bounds by folding at the edges.",
 "iwrap": "@zzz (in lo hi --> out) constrain the input to the bounds by wrapping. all inputs treated as integers.",
-"ifold": "@zzz (in lo hi --> out) constrain the input to the bounds by folding at the edges. all inputs treated as integers.",
+"ifold": "@zzz (in lo hi --> out) constrain the input to the bounds by folding at the edges. all inputs treated as integers."
+}
+},
+"mouseControls": {
+    "description": "Mouse",
+    "items": {
 "mousex": "@zz (lo hi --> out) returns a signal of the X coordinate of the mouse mapped to the linear range lo to hi.",
 "mousey": "@zz (lo hi --> out) returns a signal of the Y coordinate of the mouse mapped to the linear range lo to hi.",
 "xmousex": "@zz (lo hi --> out) returns a signal of the X coordinate of the mouse mapped to the exponential range lo to hi.",
@@ -687,7 +893,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "mousex1": "@zz (lo hi --> out) returns the current value of the X coordinate of the mouse mapped to the linear range lo to hi.",
 "mousey1": "@zz (lo hi --> out) returns the current value of the Y coordinate of the mouse mapped to the linear range lo to hi.",
 "xmousex1": "@zz (lo hi --> out) returns the current value of the X coordinate of the mouse mapped to the exponential range lo to hi.",
-"xmousey1": "@zz (lo hi --> out) returns the current value of the Y coordinate of the mouse mapped to the exponential range lo to hi.",
+"xmousey1": "@zz (lo hi --> out) returns the current value of the Y coordinate of the mouse mapped to the exponential range lo to hi."
+}
+},
+"midi": {
+    "description": "MIDI functions",
+    "items": {
 "midiStart": "(-->) start up MIDI services",
 "midiRestart": "(-->) rescan MIDI services",
 "midiStop": "(-->) stop MIDI services",
@@ -721,7 +932,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "xmtouch": "@zzzz (srcIndex chan lo hi --> out) signal of midi channel pressure mapped to the exponential range [lo,hi].",
 "xmbend": "@zzzz (srcIndex chan lo hi --> out) signal of midi pitch bend mapped to the exponential range [lo,hi].",
 "xmlastvel": "@zzzz (srcIndex chan lo hi --> out) signal of velocity of most recent midi note on mapped to the exponential range [lo,hi].",
-"zctl": "@z (zref --> out) makes a smoothed control signal from a zref.",
+"zctl": "@z (zref --> out) makes a smoothed control signal from a zref."
+}
+},
+"setOps": {
+    "description": "Set operators",
+    "items": {
 "S": "(list --> set) removes all duplicates from a finite list.",
 "S|": "(listA listB --> set) returns the set union of the elements of lists A and B.",
 "S&": "(listA listB --> set) returns the set intersection of the elements of lists A and B.",
@@ -730,7 +946,12 @@ pub(crate) const VALUES_JSON: &str = r#"
 "S=": "(listA listB --> set) returns 1 if the set of elements in listA is equal to the set of elements in listB.",
 "subset?": "(listA listB --> set) returns 1 if the set of elements of listA is a subset of the set of elements of listB. else 0.",
 "find": "(item(s) list --> set) returns index of item in finite list, or -1 if not in list.",
-"Shas": "(item(s) list --> set) returns 1 if finite list contains item(s), else 0.",
+"Shas": "(item(s) list --> set) returns 1 if finite list contains item(s), else 0."
+}
+},
+"prelude": {
+    "description": "Functions from prelude.",
+    "items": {
 "USkb40": "zxcvbnm,./asdfghjklqwertyuiop1234567890",
 "USkb49": "zxcvbnm,./~~~asdfghjkl;'~qwertyuiop[]\\1234567890-=~",
 "prall": "(list -->) print every item in a list on a separate line\" [list \\a [a pr cr] do]",
@@ -967,5 +1188,7 @@ pub(crate) const VALUES_JSON: &str = r#"
 "ev-starts": "(inEvents --> startTimes) return a stream of start times for inEvents",
 "ev-end": "(inEvents --> endTime) return the maximum end time of inEvents.",
 "ev-reverse": "(inEvents --> outEvents) reverse an event list."
+}
+}
 }
 "#;
