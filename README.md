@@ -1,6 +1,6 @@
 # SAPF Language Server
 An lsp-server for [sapf](https://github.com/lfnoise/sapf).
-Has autocompletion and hover support for docs. Might work poorly. 
+Has some syntax highlighting, autocompletion and hover support for docs. Might work poorly. 
 
 ```rust
 cargo build --release
