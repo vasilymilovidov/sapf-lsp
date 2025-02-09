@@ -166,8 +166,21 @@ impl LanguageServer for Backend {
             if let Some(line) = content.lines().nth(position.line as usize) {
                 let prefix = &line[..position.character as usize];
 
+                let mut word_start = position.character as usize;
+                for (i, c) in prefix.char_indices().rev() {
+                    if c.is_whitespace() || c == '(' || c == ')' || c == ',' {
+                        word_start = i + 1;
+                        break;
+                    }
+                    if i == 0 {
+                        word_start = 0;
+                    }
+                }
+
+                let current_input = &prefix[word_start..];
+
                 for (category_name, category_data) in &self.categories {
-                    if category_name.starts_with(prefix) {
+                    if category_name.starts_with(current_input) {
                         items.push(CompletionItem {
                             label: category_name.clone(),
                             kind: Some(CompletionItemKind::MODULE),
@@ -185,12 +198,9 @@ impl LanguageServer for Backend {
                     }
                 }
 
-                if let Some((category_prefix, item_prefix)) = prefix.split_once('.') {
+                if let Some((category_prefix, item_prefix)) = current_input.split_once('.') {
                     if let Some(category) = self.categories.get(category_prefix) {
-                        let start_position = Position::new(
-                            position.line,
-                            position.character.saturating_sub(prefix.len() as u32),
-                        );
+                        let start_position = Position::new(position.line, word_start as u32);
                         let end_position = position;
 
                         items.extend(
@@ -207,7 +217,7 @@ impl LanguageServer for Backend {
                                             start: start_position,
                                             end: end_position,
                                         },
-                                        new_text: k.clone(),
+                                        new_text: k.clone(), 
                                     })),
                                     ..Default::default()
                                 }),
@@ -218,12 +228,18 @@ impl LanguageServer for Backend {
                     items.extend(
                         all_keywords
                             .iter()
-                            .filter(|(k, _)| k.starts_with(prefix))
+                            .filter(|(k, _)| k.starts_with(current_input))
                             .map(|(k, d)| CompletionItem {
                                 label: k.clone(),
                                 kind: Some(CompletionItemKind::KEYWORD),
                                 documentation: Some(Documentation::String(d.clone())),
-                                insert_text: Some(k.clone()),
+                                text_edit: Some(CompletionTextEdit::Edit(TextEdit {
+                                    range: Range {
+                                        start: Position::new(position.line, word_start as u32),
+                                        end: position,
+                                    },
+                                    new_text: k.clone(),
+                                })),
                                 ..Default::default()
                             }),
                     );
