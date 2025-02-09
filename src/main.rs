@@ -166,7 +166,6 @@ impl LanguageServer for Backend {
             if let Some(line) = content.lines().nth(position.line as usize) {
                 let prefix = &line[..position.character as usize];
 
-                // First, add category completions
                 for (category_name, category_data) in &self.categories {
                     if category_name.starts_with(prefix) {
                         items.push(CompletionItem {
@@ -188,6 +187,12 @@ impl LanguageServer for Backend {
 
                 if let Some((category_prefix, item_prefix)) = prefix.split_once('.') {
                     if let Some(category) = self.categories.get(category_prefix) {
+                        let start_position = Position::new(
+                            position.line,
+                            position.character.saturating_sub(prefix.len() as u32),
+                        );
+                        let end_position = position;
+
                         items.extend(
                             category
                                 .items
@@ -197,7 +202,13 @@ impl LanguageServer for Backend {
                                     label: k.clone(),
                                     kind: Some(CompletionItemKind::KEYWORD),
                                     documentation: Some(Documentation::String(d.clone())),
-                                    insert_text: Some(k.clone()),
+                                    text_edit: Some(CompletionTextEdit::Edit(TextEdit {
+                                        range: Range {
+                                            start: start_position,
+                                            end: end_position,
+                                        },
+                                        new_text: k.clone(),
+                                    })),
                                     ..Default::default()
                                 }),
                         );
