@@ -1,12 +1,15 @@
 # SAPF Language Server
-
 An lsp-server for [sapf](https://github.com/lfnoise/sapf).
 Has some syntax highlighting, autocompletion and hover support for docs. Might work poorly.
 
+![demo](https://raw.githubusercontent.com/vasilymilovidov/sapf-lsp/refs/heads/main/demo.gif)
+
+## Building
 ```rust
 cargo build --release
 ```
 
+## Neovim Configuration
 ```lua
 local lspconfig = require("lspconfig")
 local configs = require("lspconfig.configs")
