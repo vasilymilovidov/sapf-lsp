@@ -179,30 +179,8 @@ impl LanguageServer for Backend {
 
                 let current_input = &prefix[word_start..];
 
-                for (category_name, category_data) in &self.categories {
-                    if category_name.starts_with(current_input) {
-                        items.push(CompletionItem {
-                            label: category_name.clone(),
-                            kind: Some(CompletionItemKind::MODULE),
-                            documentation: Some(Documentation::String(
-                                category_data.description.clone(),
-                            )),
-                            insert_text: Some(format!("{category_name}.")),
-                            command: Some(Command {
-                                title: "Trigger Suggestion".to_string(),
-                                command: "editor.action.triggerSuggest".to_string(),
-                                arguments: None,
-                            }),
-                            ..Default::default()
-                        });
-                    }
-                }
-
                 if let Some((category_prefix, item_prefix)) = current_input.split_once('.') {
                     if let Some(category) = self.categories.get(category_prefix) {
-                        let start_position = Position::new(position.line, word_start as u32);
-                        let end_position = position;
-
                         items.extend(
                             category
                                 .items
@@ -212,18 +190,45 @@ impl LanguageServer for Backend {
                                     label: k.clone(),
                                     kind: Some(CompletionItemKind::KEYWORD),
                                     documentation: Some(Documentation::String(d.clone())),
+                                    filter_text: Some(format!("{}.{}", category_prefix, k)),
                                     text_edit: Some(CompletionTextEdit::Edit(TextEdit {
                                         range: Range {
-                                            start: start_position,
-                                            end: end_position,
+                                            start: Position::new(position.line, word_start as u32),
+                                            end: position,
                                         },
-                                        new_text: k.clone(), 
+                                        new_text: k.clone(),
                                     })),
                                     ..Default::default()
                                 }),
                         );
                     }
                 } else {
+                    for (category_name, category_data) in &self.categories {
+                        if category_name.starts_with(current_input) {
+                            items.push(CompletionItem {
+                                label: format!("{}.", category_name),
+                                kind: Some(CompletionItemKind::MODULE),
+                                documentation: Some(Documentation::String(
+                                    category_data.description.clone(),
+                                )),
+                                filter_text: Some(category_name.clone()),
+                                text_edit: Some(CompletionTextEdit::Edit(TextEdit {
+                                    range: Range {
+                                        start: Position::new(position.line, word_start as u32),
+                                        end: position,
+                                    },
+                                    new_text: format!("{}.", category_name),
+                                })),
+                                command: Some(Command {
+                                    title: "Trigger Suggestion".to_string(),
+                                    command: "editor.action.triggerSuggest".to_string(),
+                                    arguments: None,
+                                }),
+                                ..Default::default()
+                            });
+                        }
+                    }
+
                     let all_keywords = self.get_all_keywords();
                     items.extend(
                         all_keywords
