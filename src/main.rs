@@ -75,7 +75,7 @@ impl LanguageServer for Backend {
                                     ],
                                     token_modifiers: vec![],
                                 },
-                                range: Some(true),
+                                range: Some(false),
                                 full: Some(SemanticTokensFullOptions::Delta { delta: Some(true) }),
                             },
                             static_registration_options: StaticRegistrationOptions::default(),
